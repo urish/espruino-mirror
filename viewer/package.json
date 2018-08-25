@@ -1,0 +1,22 @@
+{
+  "name": "viewer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "author": {
+    "name": "Uri Shaked"
+  },
+  "repository": {
+    "url": "https://github.com/urish/espruino-cast"
+  },
+  "scripts": {
+    "start": "concurrently \"tsc -w\" \"live-server dist\"",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/web-bluetooth": "^0.0.4",
+    "concurrently": "^4.0.0",
+    "live-server": "^1.2.0",
+    "typescript": "^3.0.1"
+  }
+}
