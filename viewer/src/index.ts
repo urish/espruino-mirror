@@ -1,3 +1,17 @@
+let device: BluetoothDevice | null = null;
+
+function updateButtons() {
+  const btnConnect = document.getElementById('btnconnect')!;
+  const btnDisconnect = document.getElementById('btndisconnect')!;
+  if (device) {
+    btnConnect.classList.add('hidden');
+    btnDisconnect.classList.remove('hidden');
+  } else {
+    btnConnect.classList.remove('hidden');
+    btnDisconnect.classList.add('hidden');
+  }
+}
+
 function get8bits(val: number) {
   return (val | 0x100)
     .toString(2)
@@ -7,13 +21,18 @@ function get8bits(val: number) {
 }
 
 async function connect() {
-  const device = await navigator.bluetooth.requestDevice({
+  device = await navigator.bluetooth.requestDevice({
     filters: [
       {
         services: [0xfeed],
       },
     ],
   });
+  device.addEventListener('gattserverdisconnected', () => {
+    device = null;
+    updateButtons();
+  });
+  updateButtons();
   await device.gatt!.connect();
   const svc = await device.gatt!.getPrimaryService(0xfeed);
   const width = (await (await svc.getCharacteristic(0xfe01)).readValue()).getUint16(0, true);
@@ -21,7 +40,6 @@ async function connect() {
   const canvas = document.querySelector('#main') as HTMLCanvasElement;
   canvas.setAttribute('width', width.toString());
   canvas.setAttribute('height', height.toString());
-  console.log('Canvas:', width + 'x' + height);
   const ctx = canvas.getContext('2d')!;
   const char = await svc.getCharacteristic(0xfeed);
 
@@ -52,4 +70,13 @@ async function connect() {
   await char.startNotifications();
 }
 
+function disconnect() {
+  if (device) {
+    device.gatt!.disconnect();
+    device = null;
+    updateButtons();
+  }
+}
+
 (window as any).connect = connect;
+(window as any).disconnect = disconnect;

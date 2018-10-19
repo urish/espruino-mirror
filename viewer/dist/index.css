@@ -6,3 +6,7 @@ body {
   border: solid black 1px;
   zoom: 200%;
 }
+
+.hidden {
+  display: none;
+}
